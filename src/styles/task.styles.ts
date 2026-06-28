@@ -35,6 +35,9 @@ export const taskItemStyles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
   },
+  titleBlock: {
+    gap: spacing.sm,
+  },
   title: {
     color: colors.text,
     fontSize: 16,
@@ -45,19 +48,29 @@ export const taskItemStyles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   priority: {
+    alignItems: 'center',
     alignSelf: 'flex-start',
-    borderRadius: radius.sm,
-    color: colors.surface,
-    fontSize: 12,
-    fontWeight: '700',
-    overflow: 'hidden',
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: spacing.xs,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: 3,
+  },
+  priorityDot: {
+    borderRadius: 999,
+    height: 7,
+    width: 7,
+  },
+  priorityText: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0,
     textTransform: 'uppercase',
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.md,
     marginTop: spacing.md,
   },
 });

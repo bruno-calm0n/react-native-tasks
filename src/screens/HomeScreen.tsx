@@ -1,14 +1,20 @@
 import { useState } from 'react';
-import { Alert, Modal, Text, View } from 'react-native';
+import { Modal, Text, View } from 'react-native';
 
 import { AppButton } from '../components/base/AppButton';
 import { AppCard } from '../components/base/AppCard';
 import { AppContainer } from '../components/base/AppContainer';
+import { AppDialog } from '../components/base/AppDialog';
 import { TaskForm } from '../components/tasks/TaskForm';
 import { TaskSection } from '../components/tasks/TaskSection';
 import { useTasks } from '../hooks/useTasks';
 import { homeStyles } from '../styles/home.styles';
 import { Task, TaskPriority } from '../types/task';
+
+type FeedbackDialog = {
+  title: string;
+  message: string;
+};
 
 export function HomeScreen() {
   const {
@@ -25,12 +31,17 @@ export function HomeScreen() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [editingTitle, setEditingTitle] = useState<string>('');
   const [editingPriority, setEditingPriority] = useState<TaskPriority>('medium');
+  const [feedbackDialog, setFeedbackDialog] = useState<FeedbackDialog | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   function handleAddTask(): void {
     const wasCreated = addTask(newTaskTitle, newTaskPriority);
 
     if (!wasCreated) {
-      Alert.alert('Titulo obrigatorio', 'Digite uma tarefa antes de adicionar.');
+      setFeedbackDialog({
+        title: 'Titulo obrigatorio',
+        message: 'Digite uma tarefa antes de adicionar.',
+      });
       return;
     }
 
@@ -61,7 +72,10 @@ export function HomeScreen() {
     });
 
     if (!wasUpdated) {
-      Alert.alert('Titulo obrigatorio', 'Digite um nome para salvar a tarefa.');
+      setFeedbackDialog({
+        title: 'Titulo obrigatorio',
+        message: 'Digite um nome para salvar a tarefa.',
+      });
       return;
     }
 
@@ -69,21 +83,16 @@ export function HomeScreen() {
   }
 
   function handleConfirmDelete(task: Task): void {
-    Alert.alert(
-      'Excluir tarefa',
-      `Deseja excluir "${task.title}"?`,
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => deleteTask(task.id),
-        },
-      ],
-    );
+    setTaskToDelete(task);
+  }
+
+  function handleDeleteTask(): void {
+    if (!taskToDelete) {
+      return;
+    }
+
+    deleteTask(taskToDelete.id);
+    setTaskToDelete(null);
   }
 
   return (
@@ -134,6 +143,7 @@ export function HomeScreen() {
       >
         <View style={homeStyles.modalBackdrop}>
           <View style={homeStyles.modalContent}>
+            <View style={homeStyles.modalHandle} />
             <Text style={homeStyles.modalTitle}>Editar tarefa</Text>
 
             <TaskForm
@@ -162,6 +172,40 @@ export function HomeScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppDialog
+        visible={Boolean(feedbackDialog)}
+        title={feedbackDialog?.title ?? ''}
+        message={feedbackDialog?.message ?? ''}
+        onClose={() => setFeedbackDialog(null)}
+      >
+        <AppButton
+          title="Entendi"
+          onPress={() => setFeedbackDialog(null)}
+          style={homeStyles.modalButton}
+        />
+      </AppDialog>
+
+      <AppDialog
+        visible={Boolean(taskToDelete)}
+        title="Deletar tarefa"
+        message={`Tem certeza que deseja deletar "${taskToDelete?.title ?? ''}"?`}
+        tone="danger"
+        onClose={() => setTaskToDelete(null)}
+      >
+        <AppButton
+          title="Cancelar"
+          onPress={() => setTaskToDelete(null)}
+          variant="secondary"
+          style={homeStyles.modalButton}
+        />
+        <AppButton
+          title="Deletar"
+          onPress={handleDeleteTask}
+          variant="danger"
+          style={homeStyles.modalButton}
+        />
+      </AppDialog>
     </AppContainer>
   );
 }
