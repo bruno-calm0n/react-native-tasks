@@ -8,6 +8,8 @@ export const colors = {
   primaryPressed: '#1D4ED8',
   danger: '#DC2626',
   success: '#0F9F6E',
+  warning: '#D97706',
+  disabled: '#B8C0CC',
 } as const;
 
 export const spacing = {

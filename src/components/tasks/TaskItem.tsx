@@ -1,69 +1,61 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { colors, spacing } from '../../constants/theme';
+import { taskItemStyles } from '../../styles/task.styles';
 import { Task } from '../../types/task';
+import { taskPriorityColors, taskPriorityLabels } from '../../utils/taskUtils';
+import { AppButton } from '../base/AppButton';
 import { AppCard } from '../base/AppCard';
 
 type TaskItemProps = {
   task: Task;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
-const priorityLabel: Record<Task['priority'], string> = {
-  low: 'Baixa',
-  medium: 'Media',
-  high: 'Alta',
-};
-
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
   return (
-    <AppCard style={styles.card}>
-      <View style={styles.row}>
-        <View style={styles.checkbox} />
-        <View style={styles.content}>
-          <Text style={styles.title}>{task.title}</Text>
-          {task.description ? (
-            <Text style={styles.description}>{task.description}</Text>
-          ) : null}
+    <AppCard style={taskItemStyles.card}>
+      <View style={taskItemStyles.row}>
+        <Pressable
+          accessibilityLabel={
+            task.isCompleted ? 'Marcar tarefa como pendente' : 'Marcar tarefa como concluida'
+          }
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: task.isCompleted }}
+          onPress={onToggle}
+          style={[
+            taskItemStyles.checkbox,
+            task.isCompleted ? taskItemStyles.checkboxCompleted : null,
+          ]}
+        >
+          {task.isCompleted ? <Text style={taskItemStyles.checkboxMark}>✓</Text> : null}
+        </Pressable>
+
+        <View style={taskItemStyles.content}>
+          <Text
+            style={[
+              taskItemStyles.title,
+              task.isCompleted ? taskItemStyles.titleCompleted : null,
+            ]}
+          >
+            {task.title}
+          </Text>
+          <Text
+            style={[
+              taskItemStyles.priority,
+              { backgroundColor: taskPriorityColors[task.priority] },
+            ]}
+          >
+            {taskPriorityLabels[task.priority]}
+          </Text>
         </View>
-        <Text style={styles.priority}>{priorityLabel[task.priority]}</Text>
+      </View>
+
+      <View style={taskItemStyles.actions}>
+        <AppButton title="Editar" onPress={onEdit} size="small" variant="secondary" />
+        <AppButton title="Excluir" onPress={onDelete} size="small" variant="danger" />
       </View>
     </AppCard>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    padding: spacing.md,
-  },
-  row: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  content: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  description: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  priority: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-});

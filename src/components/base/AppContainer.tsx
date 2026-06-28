@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { ScrollView, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { ScrollView, StyleProp, ViewStyle } from 'react-native';
 
-import { colors, spacing } from '../../constants/theme';
+import { containerStyles } from '../../styles/base.styles';
 
 type AppContainerProps = {
   children: ReactNode;
@@ -14,23 +14,11 @@ export function AppContainer({
 }: AppContainerProps) {
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={[styles.content, contentContainerStyle]}
+      style={containerStyles.container}
+      contentContainerStyle={[containerStyles.content, contentContainerStyle]}
       keyboardShouldPersistTaps="handled"
     >
       {children}
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
-  },
-});
