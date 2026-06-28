@@ -1,116 +1,167 @@
-import { useMemo, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Modal, Text, View } from 'react-native';
 
 import { AppButton } from '../components/base/AppButton';
+import { AppCard } from '../components/base/AppCard';
 import { AppContainer } from '../components/base/AppContainer';
-import { AppTextInput } from '../components/base/AppTextInput';
-import { TaskItem } from '../components/tasks/TaskItem';
-import { colors, spacing } from '../constants/theme';
-import { Task } from '../types/task';
-
-const initialTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Planejar o dia',
-    description: 'Definir as tres prioridades principais.',
-    priority: 'high',
-    isCompleted: false,
-  },
-  {
-    id: '2',
-    title: 'Revisar tarefas pendentes',
-    description: 'Remover ou reagendar itens sem urgencia.',
-    priority: 'medium',
-    isCompleted: false,
-  },
-];
+import { TaskForm } from '../components/tasks/TaskForm';
+import { TaskSection } from '../components/tasks/TaskSection';
+import { useTasks } from '../hooks/useTasks';
+import { homeStyles } from '../styles/home.styles';
+import { Task, TaskPriority } from '../types/task';
 
 export function HomeScreen() {
-  const [taskTitle, setTaskTitle] = useState<string>('');
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const {
+    pendingTasks,
+    completedTasks,
+    addTask,
+    updateTask,
+    toggleTaskCompletion,
+    deleteTask,
+  } = useTasks();
 
-  const pendingCount = useMemo<number>(
-    () => tasks.filter((task) => !task.isCompleted).length,
-    [tasks],
-  );
+  const [newTaskTitle, setNewTaskTitle] = useState<string>('');
+  const [newTaskPriority, setNewTaskPriority] = useState<TaskPriority>('medium');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTitle, setEditingTitle] = useState<string>('');
+  const [editingPriority, setEditingPriority] = useState<TaskPriority>('medium');
 
   function handleAddTask(): void {
-    const normalizedTitle = taskTitle.trim();
+    const wasCreated = addTask(newTaskTitle, newTaskPriority);
 
-    if (!normalizedTitle) {
+    if (!wasCreated) {
       Alert.alert('Titulo obrigatorio', 'Digite uma tarefa antes de adicionar.');
       return;
     }
 
-    const newTask: Task = {
-      id: String(Date.now()),
-      title: normalizedTitle,
-      priority: 'medium',
-      isCompleted: false,
-    };
+    setNewTaskTitle('');
+    setNewTaskPriority('medium');
+  }
 
-    setTasks((currentTasks) => [newTask, ...currentTasks]);
-    setTaskTitle('');
+  function handleOpenEdit(task: Task): void {
+    setEditingTask(task);
+    setEditingTitle(task.title);
+    setEditingPriority(task.priority);
+  }
+
+  function handleCloseEdit(): void {
+    setEditingTask(null);
+    setEditingTitle('');
+    setEditingPriority('medium');
+  }
+
+  function handleSaveEdit(): void {
+    if (!editingTask) {
+      return;
+    }
+
+    const wasUpdated = updateTask(editingTask.id, {
+      title: editingTitle,
+      priority: editingPriority,
+    });
+
+    if (!wasUpdated) {
+      Alert.alert('Titulo obrigatorio', 'Digite um nome para salvar a tarefa.');
+      return;
+    }
+
+    handleCloseEdit();
+  }
+
+  function handleConfirmDelete(task: Task): void {
+    Alert.alert(
+      'Excluir tarefa',
+      `Deseja excluir "${task.title}"?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => deleteTask(task.id),
+        },
+      ],
+    );
   }
 
   return (
     <AppContainer>
-      <View style={styles.header}>
-        <Text style={styles.eyebrow}>Minhas tarefas</Text>
-        <Text style={styles.title}>Organize o que importa hoje.</Text>
-        <Text style={styles.subtitle}>
-          {pendingCount} {pendingCount === 1 ? 'tarefa pendente' : 'tarefas pendentes'}
+      <View style={homeStyles.header}>
+        <Text style={homeStyles.eyebrow}>Minhas tarefas</Text>
+        <Text style={homeStyles.title}>Organize o que importa hoje.</Text>
+        <Text style={homeStyles.subtitle}>
+          {pendingTasks.length}{' '}
+          {pendingTasks.length === 1 ? 'tarefa pendente' : 'tarefas pendentes'}
         </Text>
       </View>
 
-      <View style={styles.form}>
-        <AppTextInput
-          label="Nova tarefa"
-          onChangeText={setTaskTitle}
-          placeholder="Ex: Comprar mantimentos"
-          returnKeyType="done"
-          value={taskTitle}
-          onSubmitEditing={handleAddTask}
+      <AppCard style={homeStyles.formCard}>
+        <TaskForm
+          title={newTaskTitle}
+          priority={newTaskPriority}
+          submitLabel="Adicionar tarefa"
+          onTitleChange={setNewTaskTitle}
+          onPriorityChange={setNewTaskPriority}
+          onSubmit={handleAddTask}
         />
-        <AppButton title="Adicionar tarefa" onPress={handleAddTask} />
-      </View>
+      </AppCard>
 
-      <View style={styles.list}>
-        {tasks.map((task) => (
-          <TaskItem key={task.id} task={task} />
-        ))}
-      </View>
+      <TaskSection
+        title="Pendentes"
+        emptyMessage="Nenhuma tarefa pendente por enquanto."
+        tasks={pendingTasks}
+        onToggleTask={toggleTaskCompletion}
+        onEditTask={handleOpenEdit}
+        onDeleteTask={handleConfirmDelete}
+      />
+
+      <TaskSection
+        title="Concluidas"
+        emptyMessage="As tarefas concluidas aparecem aqui."
+        tasks={completedTasks}
+        onToggleTask={toggleTaskCompletion}
+        onEditTask={handleOpenEdit}
+        onDeleteTask={handleConfirmDelete}
+      />
+
+      <Modal
+        animationType="slide"
+        transparent
+        visible={Boolean(editingTask)}
+        onRequestClose={handleCloseEdit}
+      >
+        <View style={homeStyles.modalBackdrop}>
+          <View style={homeStyles.modalContent}>
+            <Text style={homeStyles.modalTitle}>Editar tarefa</Text>
+
+            <TaskForm
+              title={editingTitle}
+              priority={editingPriority}
+              submitLabel="Salvar alteracoes"
+              showSubmitButton={false}
+              onTitleChange={setEditingTitle}
+              onPriorityChange={setEditingPriority}
+              onSubmit={handleSaveEdit}
+            />
+
+            <View style={homeStyles.modalActions}>
+              <AppButton
+                title="Cancelar"
+                onPress={handleCloseEdit}
+                variant="secondary"
+                style={homeStyles.modalButton}
+              />
+              <AppButton
+                title="Salvar"
+                onPress={handleSaveEdit}
+                style={homeStyles.modalButton}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </AppContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  eyebrow: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  title: {
-    color: colors.text,
-    fontSize: 30,
-    fontWeight: '800',
-    lineHeight: 36,
-  },
-  subtitle: {
-    color: colors.textMuted,
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  form: {
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  list: {
-    gap: spacing.md,
-  },
-});

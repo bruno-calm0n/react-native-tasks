@@ -20,9 +20,11 @@ src/
   components/
     base/
     tasks/
-  constants/
+  hooks/
   screens/
+  styles/
   types/
+  utils/
 ```
 
 ## Como rodar localmente
