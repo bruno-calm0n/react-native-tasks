@@ -12,12 +12,6 @@ export const taskPriorityColors: Record<TaskPriority, string> = {
   low: '#0F9F6E',
 };
 
-export const taskPriorityBackgroundColors: Record<TaskPriority, string> = {
-  high: '#FEE2E2',
-  medium: '#FEF3C7',
-  low: '#DFF7EC',
-};
-
 export function normalizeTaskTitle(title: string): string {
   return title.trim().replace(/\s+/g, ' ');
 }
