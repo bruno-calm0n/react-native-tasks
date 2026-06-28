@@ -8,7 +8,7 @@ import {
 
 import { buttonStyles } from '../../styles/base.styles';
 
-type AppButtonVariant = 'primary' | 'secondary' | 'danger';
+type AppButtonVariant = 'primary' | 'secondary' | 'danger' | 'text' | 'textDanger';
 type AppButtonSize = 'regular' | 'small';
 
 type AppButtonProps = {
@@ -28,16 +28,22 @@ export function AppButton({
   size = 'regular',
   style,
 }: AppButtonProps) {
+  const isTextVariant = variant === 'text' || variant === 'textDanger';
+
   const variantStyle = {
     primary: buttonStyles.primary,
     secondary: buttonStyles.secondary,
     danger: buttonStyles.danger,
+    text: buttonStyles.text,
+    textDanger: buttonStyles.text,
   }[variant];
 
   const labelStyle = {
     primary: buttonStyles.primaryLabel,
     secondary: buttonStyles.secondaryLabel,
     danger: buttonStyles.dangerLabel,
+    text: buttonStyles.textLabel,
+    textDanger: buttonStyles.textDangerLabel,
   }[variant];
 
   const buttonStyle = ({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => [
@@ -45,7 +51,8 @@ export function AppButton({
     size === 'small' ? buttonStyles.small : null,
     variantStyle,
     pressed && !disabled ? buttonStyles.pressed : buttonStyles.idle,
-    disabled ? buttonStyles.disabled : buttonStyles.enabled,
+    disabled ? buttonStyles.disabled : null,
+    !disabled && !isTextVariant ? buttonStyles.enabled : null,
     style,
   ];
 

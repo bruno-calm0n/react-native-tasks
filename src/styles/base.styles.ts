@@ -39,6 +39,13 @@ export const buttonStyles = StyleSheet.create({
   danger: {
     backgroundColor: colors.danger,
   },
+  text: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    borderWidth: 0,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   pressed: {
     opacity: 0.88,
   },
@@ -70,6 +77,12 @@ export const buttonStyles = StyleSheet.create({
   },
   dangerLabel: {
     color: colors.surface,
+  },
+  textLabel: {
+    color: colors.primary,
+  },
+  textDangerLabel: {
+    color: colors.danger,
   },
   enabledLabel: {
     opacity: 1,

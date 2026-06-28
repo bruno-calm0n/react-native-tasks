@@ -2,7 +2,11 @@ import { Pressable, Text, View } from 'react-native';
 
 import { taskItemStyles } from '../../styles/task.styles';
 import { Task } from '../../types/task';
-import { taskPriorityColors, taskPriorityLabels } from '../../utils/taskUtils';
+import {
+  taskPriorityBackgroundColors,
+  taskPriorityColors,
+  taskPriorityLabels,
+} from '../../utils/taskUtils';
 import { AppButton } from '../base/AppButton';
 import { AppCard } from '../base/AppCard';
 
@@ -32,7 +36,7 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
           {task.isCompleted ? <Text style={taskItemStyles.checkboxMark}>✓</Text> : null}
         </Pressable>
 
-        <View style={taskItemStyles.content}>
+        <View style={[taskItemStyles.content, taskItemStyles.titleBlock]}>
           <Text
             style={[
               taskItemStyles.title,
@@ -41,20 +45,36 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
           >
             {task.title}
           </Text>
-          <Text
+          <View
             style={[
               taskItemStyles.priority,
-              { backgroundColor: taskPriorityColors[task.priority] },
+              {
+                backgroundColor: taskPriorityBackgroundColors[task.priority],
+                borderColor: taskPriorityColors[task.priority],
+              },
             ]}
           >
-            {taskPriorityLabels[task.priority]}
-          </Text>
+            <View
+              style={[
+                taskItemStyles.priorityDot,
+                { backgroundColor: taskPriorityColors[task.priority] },
+              ]}
+            />
+            <Text
+              style={[
+                taskItemStyles.priorityText,
+                { color: taskPriorityColors[task.priority] },
+              ]}
+            >
+              {taskPriorityLabels[task.priority]}
+            </Text>
+          </View>
         </View>
       </View>
 
       <View style={taskItemStyles.actions}>
-        <AppButton title="Editar" onPress={onEdit} size="small" variant="secondary" />
-        <AppButton title="Excluir" onPress={onDelete} size="small" variant="danger" />
+        <AppButton title="Editar" onPress={onEdit} size="small" variant="text" />
+        <AppButton title="Deletar" onPress={onDelete} size="small" variant="textDanger" />
       </View>
     </AppCard>
   );
