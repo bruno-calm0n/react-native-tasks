@@ -2,7 +2,7 @@ import { Task, TaskPriority } from '../types/task';
 
 export const taskPriorityLabels: Record<TaskPriority, string> = {
   high: 'Alta',
-  medium: 'Media',
+  medium: 'Média',
   low: 'Baixa',
 };
 
@@ -16,9 +16,28 @@ export function normalizeTaskTitle(title: string): string {
   return title.trim().replace(/\s+/g, ' ');
 }
 
+type RandomUUIDProvider = {
+  randomUUID?: () => string;
+};
+
+let fallbackTaskIdSequence = 0;
+
+function createTaskId(): string {
+  const cryptoProvider = (globalThis as typeof globalThis & {
+    crypto?: RandomUUIDProvider;
+  }).crypto;
+
+  if (typeof cryptoProvider?.randomUUID === 'function') {
+    return cryptoProvider.randomUUID();
+  }
+
+  fallbackTaskIdSequence += 1;
+  return `${Date.now()}-${fallbackTaskIdSequence}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function createTask(title: string, priority: TaskPriority): Task {
   return {
-    id: String(Date.now()),
+    id: createTaskId(),
     title: normalizeTaskTitle(title),
     priority,
     isCompleted: false,
