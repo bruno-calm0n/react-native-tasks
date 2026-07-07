@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 
 import { AppButton } from '../components/base/AppButton';
@@ -40,12 +40,16 @@ export function HomeScreen() {
     setSuccessToastMessage(message);
   }
 
+  const hideSuccessToast = useCallback((): void => {
+    setSuccessToastMessage('');
+  }, []);
+
   function handleAddTask(): void {
     const wasCreated = addTask(newTaskTitle, newTaskPriority);
 
     if (!wasCreated) {
       setFeedbackDialog({
-        title: 'Titulo obrigatorio',
+        title: 'Título obrigatório',
         message: 'Digite uma tarefa antes de adicionar.',
       });
       return;
@@ -80,7 +84,7 @@ export function HomeScreen() {
 
     if (!wasUpdated) {
       setFeedbackDialog({
-        title: 'Titulo obrigatorio',
+        title: 'Título obrigatório',
         message: 'Digite um nome para salvar a tarefa.',
       });
       return;
@@ -136,8 +140,8 @@ export function HomeScreen() {
         />
 
         <TaskSection
-          title="Concluidas"
-          emptyMessage="As tarefas concluidas aparecem aqui."
+          title="Concluídas"
+          emptyMessage="As tarefas concluídas aparecem aqui."
           tasks={completedTasks}
           onToggleTask={toggleTaskCompletion}
           onEditTask={handleOpenEdit}
@@ -158,7 +162,7 @@ export function HomeScreen() {
               <TaskForm
                 title={editingTitle}
                 priority={editingPriority}
-                submitLabel="Salvar alteracoes"
+                submitLabel="Salvar alterações"
                 showSubmitButton={false}
                 onTitleChange={setEditingTitle}
                 onPriorityChange={setEditingPriority}
@@ -221,7 +225,7 @@ export function HomeScreen() {
         visible={Boolean(successToastMessage)}
         label="Sucesso"
         message={successToastMessage}
-        onHide={() => setSuccessToastMessage('')}
+        onHide={hideSuccessToast}
       />
     </>
   );
