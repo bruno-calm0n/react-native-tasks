@@ -127,6 +127,10 @@ export function HomeScreen() {
   }
 
   function handleOpenEdit(task: Task): void {
+    if (task.isCompleted) {
+      return;
+    }
+
     setEditingTask(task);
     setEditingTitle(task.title);
     setEditingPriority(task.priority);
