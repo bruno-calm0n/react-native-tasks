@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { colors, radius, spacing } from './theme';
+import { colors, layout, radius, shadows, spacing, typography } from '../design';
 
 export const containerStyles = StyleSheet.create({
   container: {
@@ -9,9 +9,9 @@ export const containerStyles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    maxWidth: 720,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
+    maxWidth: layout.maxContentWidth,
+    paddingHorizontal: layout.horizontalPadding,
+    paddingVertical: spacing.space10,
     width: '100%',
     alignSelf: 'center',
   },
@@ -22,14 +22,14 @@ export const buttonStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    borderRadius: radius.button,
+    paddingHorizontal: spacing.space5,
+    paddingVertical: spacing.space3,
   },
   small: {
-    minHeight: 36,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    minHeight: layout.minTouchTarget,
+    paddingHorizontal: spacing.space4,
+    paddingVertical: spacing.space2,
   },
   primary: {
     backgroundColor: colors.primary,
@@ -37,6 +37,11 @@ export const buttonStyles = StyleSheet.create({
   secondary: {
     backgroundColor: colors.surface,
     borderColor: colors.border,
+    borderWidth: 1,
+  },
+  ghost: {
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primaryLight,
     borderWidth: 1,
   },
   danger: {
@@ -50,32 +55,33 @@ export const buttonStyles = StyleSheet.create({
     shadowOpacity: 0,
   },
   pressed: {
-    opacity: 0.88,
+    opacity: 0.9,
   },
   idle: {
     opacity: 1,
   },
   enabled: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    ...shadows.small,
   },
   disabled: {
-    opacity: 0.5,
+    backgroundColor: colors.textDisabled,
+    borderColor: colors.textDisabled,
+    opacity: 1,
   },
   label: {
-    fontSize: 16,
+    ...typography.body,
     fontWeight: '700',
   },
   smallLabel: {
-    fontSize: 13,
+    ...typography.caption,
   },
   primaryLabel: {
     color: colors.surface,
   },
   secondaryLabel: {
+    color: colors.textPrimary,
+  },
+  ghostLabel: {
     color: colors.primary,
   },
   dangerLabel: {
@@ -91,52 +97,51 @@ export const buttonStyles = StyleSheet.create({
     opacity: 1,
   },
   disabledLabel: {
-    opacity: 0.7,
+    color: colors.surface,
   },
 });
 
 export const cardStyles = StyleSheet.create({
   card: {
-    borderRadius: radius.lg,
+    borderRadius: radius.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: colors.borderLight,
+    backgroundColor: colors.card,
+    padding: spacing.space5,
+    ...shadows.medium,
   },
 });
 
 export const textInputStyles = StyleSheet.create({
   wrapper: {
-    gap: spacing.sm,
+    gap: spacing.space2,
   },
   label: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: '700',
+    color: colors.textPrimary,
+    ...typography.small,
+    fontWeight: '600',
   },
   input: {
     minHeight: 48,
-    borderRadius: radius.md,
+    borderRadius: radius.input,
     borderWidth: 1,
     backgroundColor: colors.surface,
-    color: colors.text,
-    fontSize: 16,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    color: colors.textPrimary,
+    ...typography.body,
+    paddingHorizontal: spacing.space4,
+    paddingVertical: spacing.space3,
   },
   inputIdle: {
     borderColor: colors.border,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
   },
   inputError: {
     borderColor: colors.danger,
   },
   error: {
     color: colors.danger,
-    fontSize: 13,
+    ...typography.caption,
   },
 });

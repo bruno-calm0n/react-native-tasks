@@ -6,12 +6,6 @@ export const taskPriorityLabels: Record<TaskPriority, string> = {
   low: 'Baixa',
 };
 
-export const taskPriorityColors: Record<TaskPriority, string> = {
-  high: '#DC2626',
-  medium: '#D97706',
-  low: '#0F9F6E',
-};
-
 export function normalizeTaskTitle(title: string): string {
   return title.trim().replace(/\s+/g, ' ');
 }

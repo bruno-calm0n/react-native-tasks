@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 
-import { homeStyles } from '../../styles/home.styles';
+import { layout } from '../../design';
+import { toastStyles } from '../../styles/feedback.styles';
 
 type AppToastProps = {
   visible: boolean;
@@ -15,7 +16,7 @@ export function AppToast({
   visible,
   label,
   message,
-  durationMs = 5000,
+  durationMs = layout.toastDurationMs,
   onHide,
 }: AppToastProps) {
   useEffect(() => {
@@ -33,10 +34,10 @@ export function AppToast({
   }
 
   return (
-    <View pointerEvents="none" style={homeStyles.toastWrapper}>
-      <View style={homeStyles.toastContent}>
-        <Text style={homeStyles.toastLabel}>{label}</Text>
-        <Text style={homeStyles.toastMessage}>{message}</Text>
+    <View pointerEvents="none" style={toastStyles.wrapper}>
+      <View style={toastStyles.content}>
+        <Text style={toastStyles.label}>{label}</Text>
+        <Text style={toastStyles.message}>{message}</Text>
       </View>
     </View>
   );
