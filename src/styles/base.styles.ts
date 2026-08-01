@@ -9,8 +9,11 @@ export const containerStyles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+    maxWidth: 720,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xxl,
+    width: '100%',
+    alignSelf: 'center',
   },
 });
 

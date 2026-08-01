@@ -19,7 +19,7 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
       <View style={taskItemStyles.row}>
         <Pressable
           accessibilityLabel={
-            task.isCompleted ? 'Marcar tarefa como pendente' : 'Marcar tarefa como concluida'
+            task.isCompleted ? 'Marcar tarefa como pendente' : 'Marcar tarefa como concluída'
           }
           accessibilityRole="checkbox"
           accessibilityState={{ checked: task.isCompleted }}
