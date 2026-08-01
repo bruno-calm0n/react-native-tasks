@@ -1,8 +1,8 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
 
 import { taskItemStyles } from '../../styles/task.styles';
-import { Task } from '../../types/task';
-import { taskPriorityColors, taskPriorityLabels } from '../../utils/taskUtils';
+import { Task, TaskPriority } from '../../types/task';
+import { taskPriorityLabels } from '../../utils/taskUtils';
 import { AppButton } from '../base/AppButton';
 import { AppCard } from '../base/AppCard';
 
@@ -11,6 +11,18 @@ type TaskItemProps = {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
+};
+
+const priorityBadgeStyles: Record<TaskPriority, StyleProp<ViewStyle>> = {
+  high: taskItemStyles.priorityHigh,
+  medium: taskItemStyles.priorityMedium,
+  low: taskItemStyles.priorityLow,
+};
+
+const priorityTextStyles: Record<TaskPriority, StyleProp<TextStyle>> = {
+  high: taskItemStyles.priorityHighText,
+  medium: taskItemStyles.priorityMediumText,
+  low: taskItemStyles.priorityLowText,
 };
 
 export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
@@ -49,14 +61,11 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
           <AppButton title="Editar" onPress={onEdit} size="small" variant="text" />
           <AppButton title="Deletar" onPress={onDelete} size="small" variant="textDanger" />
         </View>
-        <Text
-          style={[
-            taskItemStyles.priorityText,
-            { color: taskPriorityColors[task.priority] },
-          ]}
-        >
-          {taskPriorityLabels[task.priority]}
-        </Text>
+        <View style={[taskItemStyles.priorityBadge, priorityBadgeStyles[task.priority]]}>
+          <Text style={[taskItemStyles.priorityText, priorityTextStyles[task.priority]]}>
+            {taskPriorityLabels[task.priority]}
+          </Text>
+        </View>
       </View>
     </AppCard>
   );

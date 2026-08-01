@@ -8,7 +8,7 @@ import {
 
 import { buttonStyles } from '../../styles/base.styles';
 
-type AppButtonVariant = 'primary' | 'secondary' | 'danger' | 'text' | 'textDanger';
+type AppButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'text' | 'textDanger';
 type AppButtonSize = 'regular' | 'small';
 
 type AppButtonProps = {
@@ -28,11 +28,12 @@ export function AppButton({
   size = 'regular',
   style,
 }: AppButtonProps) {
-  const isTextVariant = variant === 'text' || variant === 'textDanger';
+  const isTextVariant = variant === 'ghost' || variant === 'text' || variant === 'textDanger';
 
   const variantStyle = {
     primary: buttonStyles.primary,
     secondary: buttonStyles.secondary,
+    ghost: buttonStyles.ghost,
     danger: buttonStyles.danger,
     text: buttonStyles.text,
     textDanger: buttonStyles.text,
@@ -41,6 +42,7 @@ export function AppButton({
   const labelStyle = {
     primary: buttonStyles.primaryLabel,
     secondary: buttonStyles.secondaryLabel,
+    ghost: buttonStyles.ghostLabel,
     danger: buttonStyles.dangerLabel,
     text: buttonStyles.textLabel,
     textDanger: buttonStyles.textDangerLabel,

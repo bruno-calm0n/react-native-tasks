@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Modal, Text, View } from 'react-native';
 
-import { homeStyles } from '../../styles/home.styles';
+import { dialogStyles } from '../../styles/feedback.styles';
 
 type AppDialogTone = 'default' | 'danger';
 
@@ -24,19 +24,19 @@ export function AppDialog({
 }: AppDialogProps) {
   return (
     <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
-      <View style={homeStyles.dialogBackdrop}>
-        <View style={homeStyles.dialogContent}>
+      <View style={dialogStyles.backdrop}>
+        <View style={dialogStyles.content}>
           <View
             style={[
-              homeStyles.dialogAccent,
-              tone === 'danger' ? homeStyles.dialogAccentDanger : null,
+              dialogStyles.accent,
+              tone === 'danger' ? dialogStyles.accentDanger : null,
             ]}
           />
           <View>
-            <Text style={homeStyles.dialogTitle}>{title}</Text>
-            <Text style={homeStyles.dialogMessage}>{message}</Text>
+            <Text style={dialogStyles.title}>{title}</Text>
+            <Text style={dialogStyles.message}>{message}</Text>
           </View>
-          <View style={homeStyles.dialogActions}>{children}</View>
+          <View style={dialogStyles.actions}>{children}</View>
         </View>
       </View>
     </Modal>
