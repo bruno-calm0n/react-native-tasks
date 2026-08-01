@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { Modal, Text, View } from 'react-native';
+import { type ReactElement, useCallback, useMemo, useState } from 'react';
+import { FlatList, ListRenderItemInfo, Modal, Text, View } from 'react-native';
 
 import { AppButton } from '../components/base/AppButton';
 import { AppCard } from '../components/base/AppCard';
@@ -7,8 +7,9 @@ import { AppContainer } from '../components/base/AppContainer';
 import { AppDialog } from '../components/base/AppDialog';
 import { AppToast } from '../components/base/AppToast';
 import { TaskForm } from '../components/tasks/TaskForm';
-import { TaskSection } from '../components/tasks/TaskSection';
+import { TaskItem } from '../components/tasks/TaskItem';
 import { useTasks } from '../hooks/useTasks';
+import { containerStyles } from '../styles/base.styles';
 import { homeStyles } from '../styles/home.styles';
 import { Task, TaskPriority } from '../types/task';
 
@@ -16,6 +17,25 @@ type FeedbackDialog = {
   title: string;
   message: string;
 };
+
+type TaskListItem =
+  | {
+      key: string;
+      type: 'section';
+      title: string;
+      count: number;
+      isFirst: boolean;
+    }
+  | {
+      key: string;
+      type: 'task';
+      task: Task;
+    }
+  | {
+      key: string;
+      type: 'empty';
+      message: string;
+    };
 
 export function HomeScreen() {
   const {
@@ -35,6 +55,52 @@ export function HomeScreen() {
   const [feedbackDialog, setFeedbackDialog] = useState<FeedbackDialog | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [successToastMessage, setSuccessToastMessage] = useState<string>('');
+
+  const taskListItems = useMemo<TaskListItem[]>(
+    () => [
+      {
+        key: 'pending-section',
+        type: 'section',
+        title: 'Pendentes',
+        count: pendingTasks.length,
+        isFirst: true,
+      },
+      ...(pendingTasks.length > 0
+        ? pendingTasks.map((task) => ({
+            key: `pending-${task.id}`,
+            type: 'task' as const,
+            task,
+          }))
+        : [
+            {
+              key: 'pending-empty',
+              type: 'empty' as const,
+              message: 'Nenhuma tarefa pendente por enquanto.',
+            },
+          ]),
+      {
+        key: 'completed-section',
+        type: 'section',
+        title: 'Concluídas',
+        count: completedTasks.length,
+        isFirst: false,
+      },
+      ...(completedTasks.length > 0
+        ? completedTasks.map((task) => ({
+            key: `completed-${task.id}`,
+            type: 'task' as const,
+            task,
+          }))
+        : [
+            {
+              key: 'completed-empty',
+              type: 'empty' as const,
+              message: 'As tarefas concluídas aparecem aqui.',
+            },
+          ]),
+    ],
+    [completedTasks, pendingTasks],
+  );
 
   function showSuccessToast(message: string): void {
     setSuccessToastMessage(message);
@@ -107,9 +173,9 @@ export function HomeScreen() {
     showSuccessToast('Tarefa deletada com sucesso.');
   }
 
-  return (
-    <>
-      <AppContainer>
+  function renderListHeader(): ReactElement {
+    return (
+      <>
         <View style={homeStyles.header}>
           <Text style={homeStyles.eyebrow}>Minhas tarefas</Text>
           <Text style={homeStyles.title}>Organize o que importa hoje.</Text>
@@ -129,23 +195,59 @@ export function HomeScreen() {
             onSubmit={handleAddTask}
           />
         </AppCard>
+      </>
+    );
+  }
 
-        <TaskSection
-          title="Pendentes"
-          emptyMessage="Nenhuma tarefa pendente por enquanto."
-          tasks={pendingTasks}
-          onToggleTask={toggleTaskCompletion}
-          onEditTask={handleOpenEdit}
-          onDeleteTask={handleConfirmDelete}
+  function renderTaskListItem({
+    item,
+  }: ListRenderItemInfo<TaskListItem>): ReactElement {
+    if (item.type === 'section') {
+      return (
+        <View
+          style={[
+            homeStyles.sectionHeader,
+            homeStyles.sectionHeaderRow,
+            item.isFirst ? null : homeStyles.sectionHeaderRowWithTopMargin,
+          ]}
+        >
+          <Text style={homeStyles.sectionTitle}>{item.title}</Text>
+          <Text style={homeStyles.sectionCount}>{item.count}</Text>
+        </View>
+      );
+    }
+
+    if (item.type === 'empty') {
+      return (
+        <View style={[homeStyles.emptyState, homeStyles.listRow]}>
+          <Text style={homeStyles.emptyText}>{item.message}</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={homeStyles.listRow}>
+        <TaskItem
+          task={item.task}
+          onToggle={() => toggleTaskCompletion(item.task.id)}
+          onEdit={() => handleOpenEdit(item.task)}
+          onDelete={() => handleConfirmDelete(item.task)}
         />
+      </View>
+    );
+  }
 
-        <TaskSection
-          title="Concluídas"
-          emptyMessage="As tarefas concluídas aparecem aqui."
-          tasks={completedTasks}
-          onToggleTask={toggleTaskCompletion}
-          onEditTask={handleOpenEdit}
-          onDeleteTask={handleConfirmDelete}
+  return (
+    <>
+      <AppContainer>
+        <FlatList
+          data={taskListItems}
+          renderItem={renderTaskListItem}
+          keyExtractor={(item) => item.key}
+          ListHeaderComponent={renderListHeader}
+          contentContainerStyle={containerStyles.content}
+          keyboardShouldPersistTaps="handled"
+          style={homeStyles.list}
         />
 
         <Modal

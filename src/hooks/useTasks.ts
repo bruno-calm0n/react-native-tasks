@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Task, TaskPriority } from '../types/task';
 import { createTask, normalizeTaskTitle, splitTasksByStatus } from '../utils/taskUtils';
+
+const TASKS_STORAGE_KEY = '@react-native-tasks/tasks';
 
 const initialTasks: Task[] = [
   {
@@ -23,13 +26,79 @@ type UpdateTaskInput = {
   priority: TaskPriority;
 };
 
+function isTask(value: unknown): value is Task {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const task = value as Task;
+
+  return (
+    typeof task.id === 'string' &&
+    typeof task.title === 'string' &&
+    (task.priority === 'high' || task.priority === 'medium' || task.priority === 'low') &&
+    typeof task.isCompleted === 'boolean'
+  );
+}
+
+function parseStoredTasks(storedTasks: string): Task[] | null {
+  try {
+    const parsedTasks: unknown = JSON.parse(storedTasks);
+
+    if (!Array.isArray(parsedTasks) || !parsedTasks.every(isTask)) {
+      return null;
+    }
+
+    return parsedTasks;
+  } catch {
+    return null;
+  }
+}
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [hasLoadedStoredTasks, setHasLoadedStoredTasks] = useState<boolean>(false);
 
   const { pendingTasks, completedTasks } = useMemo(
     () => splitTasksByStatus(tasks),
     [tasks],
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadTasks(): Promise<void> {
+      const storedTasks = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (storedTasks) {
+        const parsedTasks = parseStoredTasks(storedTasks);
+
+        if (parsedTasks) {
+          setTasks(parsedTasks);
+        }
+      }
+
+      setHasLoadedStoredTasks(true);
+    }
+
+    loadTasks().catch(() => undefined);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedStoredTasks) {
+      return;
+    }
+
+    AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks)).catch(() => undefined);
+  }, [hasLoadedStoredTasks, tasks]);
 
   function addTask(title: string, priority: TaskPriority): boolean {
     const normalizedTitle = normalizeTaskTitle(title);

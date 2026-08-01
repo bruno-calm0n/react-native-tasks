@@ -27,14 +27,19 @@ export const homeStyles = StyleSheet.create({
   formCard: {
     marginBottom: spacing.xl,
   },
-  section: {
-    gap: spacing.md,
-    marginBottom: spacing.xl,
+  list: {
+    flex: 1,
   },
   sectionHeader: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  sectionHeaderRow: {
+    marginBottom: spacing.md,
+  },
+  sectionHeaderRowWithTopMargin: {
+    marginTop: spacing.md,
   },
   sectionTitle: {
     color: colors.text,
@@ -58,6 +63,9 @@ export const homeStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',
+  },
+  listRow: {
+    marginBottom: spacing.md,
   },
   modalBackdrop: {
     flex: 1,
