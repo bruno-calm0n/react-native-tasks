@@ -58,7 +58,9 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
 
       <View style={taskItemStyles.footer}>
         <View style={taskItemStyles.actions}>
-          <AppButton title="Editar" onPress={onEdit} size="small" variant="text" />
+          {!task.isCompleted ? (
+            <AppButton title="Editar" onPress={onEdit} size="small" variant="text" />
+          ) : null}
           <AppButton title="Deletar" onPress={onDelete} size="small" variant="textDanger" />
         </View>
         <View style={[taskItemStyles.priorityBadge, priorityBadgeStyles[task.priority]]}>
